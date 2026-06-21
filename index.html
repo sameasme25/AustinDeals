@@ -735,11 +735,11 @@
             </div>
             <div class="form-group">
               <label>Your name *</label>
-              <input type="text" placeholder="Owner / manager name" required>
+              <input type="text" name="contact_name" placeholder="Owner / manager name" required>
             </div>
             <div class="form-group">
               <label>Your role *</label>
-              <select required>
+              <select name="role" required>
                 <option value="">Select...</option>
                 <option>Owner</option>
                 <option>General Manager</option>
@@ -750,11 +750,11 @@
             </div>
             <div class="form-group">
               <label>Email *</label>
-              <input type="email" placeholder="you@yourvenue.com" required>
+              <input type="email" name="email" placeholder="you@yourvenue.com" required>
             </div>
             <div class="form-group">
               <label>Phone</label>
-              <input type="tel" placeholder="(512) 555-0000">
+              <input type="tel" name="phone" placeholder="(512) 555-0000">
             </div>
           </div>
         </div>
@@ -791,11 +791,11 @@
             </div>
             <div class="form-group full">
               <label>Effective date of change</label>
-              <input type="text" placeholder="e.g. June 1, 2026 or 'already in effect'">
+              <input type="text" name="effective_date" placeholder="e.g. June 1, 2026 or 'already in effect'">
             </div>
             <div class="form-group full">
               <label>Anything else we should know?</label>
-              <textarea placeholder="Seasonal notes, limited time offers, new hours, etc." rows="2"></textarea>
+              <textarea name="notes" placeholder="Seasonal notes, limited time offers, new hours, etc." rows="2"></textarea>
             </div>
           </div>
         </div>
@@ -1467,10 +1467,47 @@ function toggleUpdateType(label, e) {
   label.classList.toggle('checked');
 }
 
-function handleUpdate(e) {
+async function handleUpdate(e) {
   e.preventDefault();
-  document.getElementById('update-form').style.display = 'none';
-  document.getElementById('update-success').style.display = 'block';
+  const form = document.getElementById('update-form');
+  const btn = form.querySelector('.submit-btn');
+
+  const changeTypes = [...document.querySelectorAll('#update-types .update-type-btn.checked')]
+    .map(l => l.textContent.trim()).join(', ') || 'Not specified';
+
+  const data = new FormData();
+  data.append('Venue', document.getElementById('update-venue').value);
+  data.append('Contact Name', form.querySelector('[name="contact_name"]').value);
+  data.append('Role', form.querySelector('[name="role"]').value);
+  data.append('Email', form.querySelector('[name="email"]').value);
+  data.append('Phone', form.querySelector('[name="phone"]').value);
+  data.append('Type of Change', changeTypes);
+  data.append('Updated Details', document.getElementById('update-new').value);
+  data.append('Effective Date', form.querySelector('[name="effective_date"]').value);
+  data.append('Notes', form.querySelector('[name="notes"]').value);
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://formspree.io/f/mpqgadwz', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('update-success').style.display = 'block';
+    } else {
+      btn.textContent = 'Submit update →';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
+  } catch {
+    btn.textContent = 'Submit update →';
+    btn.disabled = false;
+    alert('Something went wrong. Please try again.');
+  }
 }
 
 // Populate venue datalist for autocomplete
