@@ -765,22 +765,22 @@
             <div class="form-group full">
               <label>Type of change *</label>
               <div class="update-type-grid" id="update-types">
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="hours"> 🕐 Happy hour times changed
                 </label>
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="deals"> 🍹 Deal prices or items changed
                 </label>
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="days"> 📅 Days of the week changed
                 </label>
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="closed"> 🔒 We've permanently closed
                 </label>
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="temp"> ⏸ Temporarily closed / on hiatus
                 </label>
-                <label class="update-type-btn" onclick="toggleUpdateType(this)">
+                <label class="update-type-btn" onclick="toggleUpdateType(this, event)">
                   <input type="checkbox" value="other"> ✏️ Other correction
                 </label>
               </div>
@@ -1462,7 +1462,8 @@ function handleNewsletter(e) {
   document.getElementById('newsletter-success').style.display = 'block';
 }
 
-function toggleUpdateType(label) {
+function toggleUpdateType(label, e) {
+  e.preventDefault();
   label.classList.toggle('checked');
 }
 
@@ -1687,12 +1688,12 @@ function populateVenueList() {
                 <div class="form-group full">
                   <label>What's the issue? *</label>
                   <div class="update-type-grid">
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> 🕐 Wrong hours</label>
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> 🍹 Wrong prices or deals</label>
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> 📅 Wrong days</label>
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> 🔒 Venue has closed</label>
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> 📍 Wrong location on map</label>
-                    <label class="update-type-btn" onclick="toggleUpdateType(this)"><input type="checkbox"> ✏️ Other</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> 🕐 Wrong hours</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> 🍹 Wrong prices or deals</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> 📅 Wrong days</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> 🔒 Venue has closed</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> 📍 Wrong location on map</label>
+                    <label class="update-type-btn" onclick="toggleUpdateType(this, event)"><input type="checkbox"> ✏️ Other</label>
                   </div>
                 </div>
                 <div class="form-group full">
