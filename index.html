@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e1017">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>ATX Yummy Face — Austin's Best Deals</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,13 +35,22 @@
     --tag-text: #9ca3af;
   }
 
+  html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     font-family: 'Inter', -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    min-height: 100dvh;
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   /* NAV */
@@ -49,7 +60,9 @@
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 1.5rem;
-    height: 52px;
+    padding-top: env(safe-area-inset-top);
+    height: calc(52px + env(safe-area-inset-top));
+    gap: 8px;
   }
   .logo {
     display: flex; align-items: center; gap: 10px;
@@ -62,15 +75,24 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; flex-shrink: 0;
   }
-  .nav-tabs { display: flex; gap: 2px; }
+  .nav-tabs {
+    display: flex; gap: 2px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
   .nav-tab {
-    padding: 6px 14px; height: 34px;
+    padding: 6px 14px; min-height: 44px;
     display: flex; align-items: center;
     font-size: 13px; font-weight: 500;
     cursor: pointer; border: none; background: none;
     color: var(--muted); border-radius: 7px;
     transition: color 0.15s, background 0.15s;
     font-family: 'Inter', sans-serif;
+    flex-shrink: 0;
+    touch-action: manipulation;
   }
   .nav-tab.active { color: var(--text); background: rgba(255,255,255,0.07); }
   .nav-tab:hover:not(.active) { color: var(--muted2); background: rgba(255,255,255,0.04); }
@@ -96,13 +118,22 @@
     display: flex; flex-wrap: wrap; gap: 6px;
     margin-top: 16px;
   }
+  .scroll-row {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+  .scroll-row::-webkit-scrollbar { display: none; }
   .filter-btn {
-    padding: 5px 12px; border-radius: 6px;
+    padding: 8px 12px; min-height: 36px; border-radius: 6px;
     border: 1px solid var(--border);
     background: transparent; color: var(--muted);
     font-size: 12px; font-weight: 500;
     cursor: pointer; transition: all 0.15s;
     font-family: 'Inter', sans-serif;
+    flex-shrink: 0;
+    touch-action: manipulation;
   }
   .filter-btn:hover { border-color: var(--border-hover); color: var(--muted2); }
   .filter-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
@@ -135,6 +166,7 @@
   }
   .result-count { font-size: 12px; color: var(--muted); }
   .result-count strong { color: var(--muted2); font-weight: 500; }
+  .controls-actions { display: flex; align-items: center; gap: 8px; }
   .sort-select {
     background: var(--card-bg); border: 1px solid var(--border);
     color: var(--muted2); padding: 5px 10px; border-radius: 6px;
@@ -148,14 +180,19 @@
     display: flex; gap: 4px; padding: 10px 1.5rem;
     border-bottom: 1px solid var(--border);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .day-strip::-webkit-scrollbar { display: none; }
   .day-btn {
-    padding: 4px 11px; border-radius: 6px;
+    padding: 8px 12px; min-height: 36px; border-radius: 6px;
     border: 1px solid var(--border);
     background: transparent; color: var(--muted);
     font-size: 12px; font-weight: 500; cursor: pointer;
     white-space: nowrap; font-family: 'Inter', sans-serif;
     transition: all 0.15s;
+    flex-shrink: 0;
+    touch-action: manipulation;
   }
   .day-btn:hover { color: var(--muted2); border-color: var(--border-hover); }
   .day-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
@@ -163,7 +200,7 @@
   /* GRID */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: 1px;
     background: var(--bg);
   }
@@ -185,6 +222,7 @@
   }
 
   .card-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--amber); white-space: nowrap; }
+  .savings-badge { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--green-bg); color: var(--green); border: 1px solid rgba(52,211,153,0.25); white-space: nowrap; flex-shrink: 0; }
   .card-rating span { color: var(--muted); }
   .card-meta { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
   .tag { padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--border); }
@@ -242,7 +280,7 @@
 
   /* CARD LINKS */
   .card-links { display: flex; gap: 6px; margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--border); }
-  .card-link-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 500; text-decoration: none; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .card-link-btn { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; min-height: 36px; border-radius: 5px; border: 1px solid var(--border); color: var(--muted); font-size: 11px; font-weight: 500; text-decoration: none; transition: all 0.15s; font-family: 'Inter', sans-serif; touch-action: manipulation; }
   .card-link-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
 
   /* VIEW TOGGLE */
@@ -262,11 +300,22 @@
   #map-container {
     display: flex; height: calc(100vh - 200px); min-height: 500px;
   }
-  #map { flex: 1; z-index: 1; }
+  #map { flex: 1; z-index: 1; min-height: 280px; min-width: 0; }
   #map-sidebar {
     width: 320px; background: var(--card-bg);
     border-left: 1px solid var(--border);
     overflow-y: auto; flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .submap-layout {
+    display: flex;
+    height: 70vh;
+    min-height: 500px;
+  }
+  .submap-layout #submap {
+    flex: 1;
+    min-height: 280px;
+    min-width: 0;
   }
   #map-sidebar-inner { padding: 0; }
   .map-sidebar-card {
@@ -317,12 +366,79 @@
   /* NO RESULTS */
   .no-results { grid-column: 1 / -1; text-align: center; padding: 64px 2rem; color: var(--muted); font-size: 14px; }
 
+  @media (max-width: 768px) {
+    input[type=text], input[type=email], input[type=tel], input[type=url], select, textarea,
+    .search-bar input, .newsletter-input {
+      font-size: 16px;
+    }
+
+    nav {
+      flex-wrap: wrap;
+      align-items: center;
+      height: auto;
+      min-height: calc(52px + env(safe-area-inset-top));
+      padding: 8px 1rem;
+      padding-top: calc(8px + env(safe-area-inset-top));
+    }
+    .logo { font-size: 14px; flex: 1; min-width: 0; }
+    .nav-tabs { width: 100%; }
+
+    .hero, .controls, .day-strip, .signup-hero, .signup-form-wrap { padding-left: 1rem; padding-right: 1rem; }
+    .hero { padding-top: 24px; padding-bottom: 16px; }
+    .hero h1 { font-size: 18px; }
+
+    .filters.scroll-row { margin-right: -1rem; padding-right: 1rem; }
+    .day-strip { padding-left: 1rem; padding-right: 1rem; }
+
+    .controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .controls-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+    .sort-select { flex: 1; min-height: 40px; }
+    .view-btn { min-height: 40px; padding: 8px 12px; }
+
+    .grid { grid-template-columns: 1fr; }
+    .card { padding: 14px 16px; }
+    .card-links { flex-wrap: wrap; }
+
+    #map-container,
+    .submap-layout {
+      flex-direction: column;
+      height: auto;
+      min-height: 0;
+    }
+    #map,
+    .submap-layout #submap {
+      height: 45vh;
+      min-height: 260px;
+      width: 100%;
+    }
+    #map-sidebar,
+    #submap-sidebar {
+      width: 100%;
+      max-height: 42vh;
+      border-left: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .form-card { padding: 20px 16px; }
+    .signup-form-wrap { margin-top: 20px; margin-bottom: 32px; }
+    .pricing-card { padding: 20px 16px; }
+  }
+
   @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .deal-row { grid-template-columns: 1fr; }
     .remove-btn { width: 100%; }
-    nav, .controls, .day-strip, .hero, .signup-hero, .signup-form-wrap { padding-left: 1rem; padding-right: 1rem; }
-    .grid { grid-template-columns: 1fr; }
+    .view-btn-label { display: none; }
   }
 </style>
 </head>
@@ -349,7 +465,7 @@
       <div class="search-bar" style="margin-bottom:16px;">
         <input type="text" id="search" placeholder="Search restaurants, bars, cuisines..." oninput="applyFilters()">
       </div>
-      <div class="filters">
+      <div class="filters scroll-row">
         <button class="filter-btn active" onclick="setCategory('all',this)">All venues</button>
         <button class="filter-btn" onclick="setCategory('bar',this)">Bars</button>
         <button class="filter-btn" onclick="setCategory('mexican',this)">Mexican</button>
@@ -378,7 +494,7 @@
 
   <div class="controls">
     <div class="result-count" id="result-count">Loading...</div>
-    <div style="display:flex;gap:8px;align-items:center;">
+    <div class="controls-actions">
       <select class="sort-select" onchange="applyFilters()">
         <option value="rating">Sort: Top Rated</option>
         <option value="name">Sort: A–Z</option>
@@ -387,11 +503,11 @@
       <div class="view-toggle">
         <button class="view-btn active" id="btn-grid" onclick="setView('grid')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-          Grid
+          <span class="view-btn-label">Grid</span>
         </button>
         <button class="view-btn" id="btn-map" onclick="setView('map')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Map
+          <span class="view-btn-label">Map</span>
         </button>
       </div>
     </div>
@@ -507,13 +623,13 @@
             <div class="form-group full">
               <label>Days of the Week</label>
               <div class="day-checkboxes" id="day-checks">
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Mon</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Tue</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Wed</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Thu</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Fri</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Sat</label>
-                <label class="day-check" onclick="toggleDay(this)"><input type="checkbox">Sun</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Mon</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Tue</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Wed</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Thu</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Fri</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Sat</label>
+                <label class="day-check" onclick="toggleDay(this, event)"><input type="checkbox">Sun</label>
               </div>
             </div>
           </div>
@@ -875,11 +991,33 @@ const COORDS = {
 // Patch coords into DEALS
 DEALS.forEach(d => { const c = COORDS[d.name]; if(c){ d.lat=c[0]; d.lng=c[1]; } });
 
+function getSavingsPercent(deals) {
+  const text = deals.toLowerCase();
+  let max = 0;
+  for (const m of text.matchAll(/(\d+)%\s*off/g)) max = Math.max(max, parseInt(m[1]));
+  if (/½\s*off|half[\s-]off/.test(text)) max = Math.max(max, 50);
+  if (/2[\s-]for[\s-]1/.test(text)) max = Math.max(max, 50);
+  return max > 0 ? max : null;
+}
+
 let currentCategory = 'all';
 let currentDay = 'all';
 let currentView = 'grid';
 let leafletMap = null;
 let markers = [];
+
+function refreshMaps() {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      if (leafletMap) leafletMap.invalidateSize();
+      if (submapInstance) submapInstance.invalidateSize();
+    }, 100);
+  });
+}
+
+function popupMaxWidth() {
+  return Math.min(window.innerWidth - 48, 280);
+}
 
 function setView(v) {
   currentView = v;
@@ -890,6 +1028,7 @@ function setView(v) {
   if (v === 'map') {
     initMap();
     applyFilters();
+    refreshMaps();
   }
 }
 
@@ -905,6 +1044,7 @@ function initMap() {
       maxZoom: 19
     }).addTo(leafletMap);
     applyFilters();
+    refreshMaps();
   };
   document.head.appendChild(script);
 }
@@ -953,7 +1093,7 @@ function updateMap(data) {
           <a href="${searchUrl}" target="_blank" class="card-link-btn">🔍 Website</a>
           <a href="${mapsUrl}" target="_blank" class="card-link-btn">📍 Directions</a>
         </div>
-      `, {maxWidth: 260});
+      `, {maxWidth: popupMaxWidth()});
     m.on('click', () => {
       document.querySelectorAll('.map-sidebar-card').forEach(c => c.classList.remove('active'));
       const card = document.getElementById(`sc-${i}`);
@@ -1044,10 +1184,13 @@ function applyFilters() {
     const priceClass = (d.price === '$1–10' || d.price === '$10–20' || d.price === '$') ? 'price' : '';
     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(d.name + ' Austin TX')}`;
     const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(d.name + ' Austin TX')}`;
+    const savings = getSavingsPercent(d.deals);
+    const savingsBadge = savings ? `<span class="savings-badge">Up to ${savings}% off</span>` : '';
     return `
     <div class="card ${d.status === 'closed' ? 'closed' : ''}">
       <div class="card-header">
         <div class="card-name">${d.name}</div>
+        ${savingsBadge}
       </div>
       <div class="card-meta">
         ${d.tags.map(t => `<span class="tag">${t}</span>`).join('')}
@@ -1072,7 +1215,8 @@ function showPage(page, btn) {
   btn.classList.add('active');
 }
 
-function toggleDay(label) {
+function toggleDay(label, e) {
+  e.preventDefault();
   label.classList.toggle('checked');
 }
 
@@ -1207,6 +1351,7 @@ footer { background: var(--nav-bg); border-top: 1px solid var(--border); }
 .footer-bottom { border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
 .footer-disclaimer { font-size: 11px; color: var(--muted); line-height: 1.6; padding: 10px 14px; background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.12); border-radius: 6px; }
 .footer-copy { font-size: 11px; color: var(--muted); text-align: center; padding-top: 4px; }
+.subpage-footer { border-top: 1px solid var(--border); margin-top: 48px; padding: 32px 1.5rem 24px; max-width: 640px; margin-left: auto; margin-right: auto; }
 
 .pricing-card {
   display: flex; gap: 32px; align-items: center; flex-wrap: wrap;
@@ -1252,7 +1397,9 @@ footer { background: var(--nav-bg); border-top: 1px solid var(--border); }
   .footer-top { grid-template-columns: 1fr; gap: 32px; }
   .footer-links-group { grid-template-columns: repeat(2, 1fr); }
   .footer-newsletter { flex-direction: column; align-items: flex-start; }
-  .newsletter-form { width: 100%; }
+  .newsletter-form { width: 100%; flex-direction: column; }
+  .newsletter-btn { width: 100%; min-height: 44px; }
+  .footer-inner { padding: 32px 1rem 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
 
 /* UPDATE PAGE */
@@ -1265,6 +1412,7 @@ footer { background: var(--nav-bg); border-top: 1px solid var(--border); }
 }
 .update-notice svg { stroke: var(--amber); flex-shrink: 0; margin-top: 1px; }
 .update-notice strong { color: var(--text); }
+.update-type-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
 .update-type-btn {
@@ -1362,7 +1510,7 @@ function populateVenueList() {
         <h1>Venue Map</h1>
         <p>All ATX Yummy Face venues on one map. Click any pin to see deals.</p>
       </div>
-      <div style="display:flex;height:70vh;min-height:500px;">
+      <div class="submap-layout">
         <div id="submap"></div>
         <div id="submap-sidebar">
           <div id="submap-sidebar-inner"></div>
@@ -1649,6 +1797,17 @@ function populateVenueList() {
       </div>
     </div>
 
+    <div class="subpage-footer">
+      <div class="footer-logo" style="justify-content:center;margin-bottom:8px;">
+        <div class="logo-icon">😋</div>
+        ATX Yummy Face
+      </div>
+      <p class="footer-tagline" style="text-align:center;">Austin's most complete guide to happy hour deals — updated by the community, free forever.</p>
+      <div class="footer-bottom" style="margin-top:16px;text-align:center;">
+        <div class="footer-copy">© 2026 ATX Yummy Face · Austin, TX · All rights reserved</div>
+      </div>
+    </div>
+
   </div><!-- end subpage-body -->
 </div><!-- end subpage-overlay -->
 
@@ -1752,12 +1911,26 @@ function populateVenueList() {
 
 /* TODAY GRID */
 #sub-today .grid { background: var(--bg); }
-#today-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1px; background: var(--bg); }
+#today-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1px; background: var(--bg); }
 
 /* SUBMAP */
-#submap { flex: 1; z-index: 1; }
-#submap-sidebar { width: 300px; background: var(--card-bg); border-left: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; }
+#submap { flex: 1; z-index: 1; min-width: 0; }
+#submap-sidebar { width: 300px; background: var(--card-bg); border-left: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
 #submap-sidebar-inner { padding: 0; }
+
+@media (max-width: 768px) {
+  #today-grid { grid-template-columns: 1fr; }
+  .subpage-header {
+    padding: 0 1rem;
+    padding-top: env(safe-area-inset-top);
+    height: calc(52px + env(safe-area-inset-top));
+  }
+  .subpage-back { min-height: 44px; }
+  .subpage-body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .content-card { padding: 20px 16px; }
+  .faq-item { padding: 14px 16px; }
+  .faq-item.open .faq-a { max-height: 400px; }
+}
 
 @media (max-width: 700px) {
   .contact-grid { grid-template-columns: 1fr; }
@@ -1783,7 +1956,10 @@ function showSubPage(id) {
   activeSubpage = id;
 
   if (id === 'today') buildTodayDeals();
-  if (id === 'map-view') buildSubMap();
+  if (id === 'map-view') {
+    buildSubMap();
+    refreshMaps();
+  }
 
   // Populate report venue datalist
   if (id === 'report') {
@@ -1825,7 +2001,10 @@ function buildTodayDeals() {
 }
 
 function buildSubMap() {
-  if (submapInstance) return;
+  if (submapInstance) {
+    refreshMaps();
+    return;
+  }
   if (typeof L === 'undefined') {
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
@@ -1850,10 +2029,11 @@ function initSubMap() {
   }).join('');
   withCoords.forEach((d,i) => {
     const m = L.marker([d.lat,d.lng],{icon}).addTo(submapInstance)
-      .bindPopup(`<div class="popup-name">${d.name}</div><div class="popup-deals">${d.deals}</div><div class="popup-links"><a href="https://www.google.com/search?q=${encodeURIComponent(d.name+' Austin TX')}" target="_blank" class="card-link-btn">🔍 Website</a><a href="https://www.google.com/maps/search/${encodeURIComponent(d.name+' Austin TX')}" target="_blank" class="card-link-btn">📍 Directions</a></div>`, {maxWidth:240});
+      .bindPopup(`<div class="popup-name">${d.name}</div><div class="popup-deals">${d.deals}</div><div class="popup-links"><a href="https://www.google.com/search?q=${encodeURIComponent(d.name+' Austin TX')}" target="_blank" class="card-link-btn">🔍 Website</a><a href="https://www.google.com/maps/search/${encodeURIComponent(d.name+' Austin TX')}" target="_blank" class="card-link-btn">📍 Directions</a></div>`, {maxWidth: popupMaxWidth()});
     m.on('click', () => { document.querySelectorAll('.map-sidebar-card').forEach(c=>c.classList.remove('active')); document.getElementById(`smc-${i}`)?.classList.add('active'); });
     submapMarkers.push(m);
   });
+  refreshMaps();
 }
 
 window.focusSubMarker = function(i) {
@@ -1872,6 +2052,9 @@ function handleGenericForm(e, successId) {
   e.target.style.display = 'none';
   document.getElementById(successId).style.display = 'block';
 }
+
+window.addEventListener('resize', refreshMaps);
+window.addEventListener('orientationchange', refreshMaps);
 </script>
 </body>
 </html>
