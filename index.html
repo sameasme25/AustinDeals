@@ -562,11 +562,11 @@
           <div class="form-grid">
             <div class="form-group full">
               <label>Restaurant / Bar Name *</label>
-              <input type="text" placeholder="e.g. Whisler's" required>
+              <input id="s-venue" type="text" placeholder="e.g. Whisler's" required>
             </div>
             <div class="form-group">
               <label>Cuisine / Type *</label>
-              <select required>
+              <select id="s-cuisine" required>
                 <option value="">Select...</option>
                 <option>Bar / Cocktail Bar</option>
                 <option>Mexican</option>
@@ -587,7 +587,7 @@
             </div>
             <div class="form-group">
               <label>Price Range</label>
-              <select>
+              <select id="s-price">
                 <option>$ (Under $15)</option>
                 <option>$$ ($15–$30)</option>
                 <option selected>$$$ ($30–$60)</option>
@@ -596,15 +596,15 @@
             </div>
             <div class="form-group full">
               <label>Address *</label>
-              <input type="text" placeholder="123 E 6th St, Austin, TX 78701" required>
+              <input id="s-address" type="text" placeholder="123 E 6th St, Austin, TX 78701" required>
             </div>
             <div class="form-group">
               <label>Website</label>
-              <input type="url" placeholder="https://yourbar.com">
+              <input id="s-website" type="url" placeholder="https://yourbar.com">
             </div>
             <div class="form-group">
               <label>Instagram Handle</label>
-              <input type="text" placeholder="@yourbar">
+              <input id="s-instagram" type="text" placeholder="@yourbar">
             </div>
           </div>
         </div>
@@ -614,11 +614,11 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Happy Hour Start Time *</label>
-              <input type="text" placeholder="e.g. 4:00 PM" required>
+              <input id="s-hh-start" type="text" placeholder="e.g. 4:00 PM" required>
             </div>
             <div class="form-group">
               <label>Happy Hour End Time *</label>
-              <input type="text" placeholder="e.g. 7:00 PM" required>
+              <input id="s-hh-end" type="text" placeholder="e.g. 7:00 PM" required>
             </div>
             <div class="form-group full">
               <label>Days of the Week</label>
@@ -670,19 +670,19 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Your Name *</label>
-              <input type="text" placeholder="Manager / Owner name" required>
+              <input id="s-contact-name" type="text" placeholder="Manager / Owner name" required>
             </div>
             <div class="form-group">
               <label>Email *</label>
-              <input type="email" placeholder="you@yourbar.com" required>
+              <input id="s-email" type="email" placeholder="you@yourbar.com" required>
             </div>
             <div class="form-group">
               <label>Phone</label>
-              <input type="tel" placeholder="(512) 555-0000">
+              <input id="s-phone" type="tel" placeholder="(512) 555-0000">
             </div>
             <div class="form-group">
               <label>Best time to reach you</label>
-              <select>
+              <select id="s-best-time">
                 <option>Mornings (9am–12pm)</option>
                 <option>Afternoons (12pm–4pm)</option>
                 <option>Evenings (4pm–7pm)</option>
@@ -691,7 +691,7 @@
             </div>
             <div class="form-group full">
               <label>Anything else we should know?</label>
-              <textarea placeholder="Parking info, reservation policy, seasonal specials, etc."></textarea>
+              <textarea id="s-notes" placeholder="Parking info, reservation policy, seasonal specials, etc."></textarea>
             </div>
           </div>
         </div>
@@ -1248,10 +1248,68 @@ function removeDeal(btn) {
   if (rows.length > 1) btn.closest('.deal-row').remove();
 }
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault();
-  document.getElementById('signup-form').style.display = 'none';
-  document.getElementById('success-msg').style.display = 'block';
+  const form = document.getElementById('signup-form');
+  const btn = form.querySelector('.submit-btn');
+
+  const days = [...document.querySelectorAll('#day-checks .day-check.checked')]
+    .map(l => l.textContent.trim()).join(', ');
+
+  const deals = [...document.querySelectorAll('#deal-inputs .deal-row')].map(row => {
+    const cat = row.querySelector('select')?.value || '';
+    const desc = row.querySelector('input[type=text]')?.value || '';
+    return desc ? `${cat}: ${desc}` : null;
+  }).filter(Boolean).join(' | ');
+
+  const payload = {
+    venue_name:    document.getElementById('s-venue').value,
+    cuisine:       document.getElementById('s-cuisine').value,
+    price_range:   document.getElementById('s-price').value,
+    address:       document.getElementById('s-address').value,
+    website:       document.getElementById('s-website').value,
+    instagram:     document.getElementById('s-instagram').value,
+    hh_start:      document.getElementById('s-hh-start').value,
+    hh_end:        document.getElementById('s-hh-end').value,
+    days,
+    deals,
+    contact_name:  document.getElementById('s-contact-name').value,
+    email:         document.getElementById('s-email').value,
+    phone:         document.getElementById('s-phone').value,
+    best_time:     document.getElementById('s-best-time').value,
+    notes:         document.getElementById('s-notes').value,
+  };
+
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://youakljtrprhhsteteki.supabase.co/rest/v1/submissions', {
+      method: 'POST',
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdWFrbGp0cnByaGhzdGV0ZWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5OTczODUsImV4cCI6MjA5NzU3MzM4NX0.O-ftgWolDT70scBZCUJo12w4Z7fsN2KwhE6zD8DjYuU',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdWFrbGp0cnByaGhzdGV0ZWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5OTczODUsImV4cCI6MjA5NzU3MzM4NX0.O-ftgWolDT70scBZCUJo12w4Z7fsN2KwhE6zD8DjYuU',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('success-msg').style.display = 'block';
+    } else {
+      const err = await res.json();
+      console.error('Supabase error:', err);
+      btn.textContent = 'Submit Your Listing →';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
+  } catch {
+    btn.textContent = 'Submit Your Listing →';
+    btn.disabled = false;
+    alert('Something went wrong. Please try again.');
+  }
 }
 
 applyFilters();
